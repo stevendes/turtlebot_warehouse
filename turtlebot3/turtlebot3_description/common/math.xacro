@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="math">
+  <xacro:property name="deg2rad" value="0.017453293" />
+</robot>

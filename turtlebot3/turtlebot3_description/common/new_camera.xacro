@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="new_camera">
+    <xacro:include filename="$(find turtlebot3_description)/common/math.xacro" />
+
+    <xacro:macro name="new_camera" params="name parent=base_link x=0.0 y=0.0 z=0.0 roll=0.0 pitch=0.0 yaw=0.0">
+
+        <joint name="${name}_joint" type="fixed">
+            <origin xyz="${x} ${y} ${z}" rpy="${roll} ${pitch} ${yaw}"/>        
+            <parent link="${parent}"/>
+            <child link="${name}_link"/>
+        </joint>
+
+        <link name="${name}_link" >
+            <collision>
+            <origin xyz="0.005 0.011 0.013" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.015 0.030 0.027"/>
+            </geometry>
+            </collision>
+        </link>
+  
+        <!-- Fixed joint between a "normal" camera frame and the standard image processing frame for ${name} -->
+        <joint name="${name}_rgb_joint" type="fixed">
+            <origin xyz="0.003 0.011 0.009" rpy="0 0 0"/>
+            <parent link="${name}_link"/>
+            <child link="${name}_rgb_frame"/>
+        </joint>
+        <link name="${name}_rgb_frame"/>
+
+        <!-- The standard image processing frame (z pointing out of the lens) -->
+        <joint name="${name}_rgb_optical_joint" type="fixed">
+            <origin xyz="0 0 0" rpy="-1.57 0 -1.57"/>
+            <parent link="${name}_rgb_frame"/>
+            <child link="${name}_rgb_optical_frame"/>
+        </joint>
+        <link name="${name}_rgb_optical_frame"/>
+
+        <!--link : https://www.raspberrypi.org/documentation/hardware/camera/-->
+        <gazebo reference="${name}_rgb_frame">
+            <sensor type="camera" name="${name} Camera">
+            <always_on>true</always_on>
+            <visualize>$(arg camera_visual)</visualize>
+            <camera>
+                <horizontal_fov>1.085595</horizontal_fov>
+                <image>
+                    <width>640</width>
+                    <height>480</height>
+                    <format>R8G8B8</format>
+                </image>
+                <clip>
+                    <near>0.03</near>
+                    <far>100</far>
+                </clip>
+            </camera>
+            <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+                <alwaysOn>true</alwaysOn>
+                <updateRate>30.0</updateRate>
+                <cameraName>${name}</cameraName>
+                <frameName>${name}_rgb_optical_frame</frameName>
+                <imageTopicName>${name}/rgb/image_raw</imageTopicName>
+                <cameraInfoTopicName>${name}/rgb/camera_info</cameraInfoTopicName>
+                <hackBaseline>0.07</hackBaseline>
+                <distortionK1>0.0</distortionK1>
+                <distortionK2>0.0</distortionK2>
+                <distortionK3>0.0</distortionK3>
+                <distortionT1>0.0</distortionT1>
+                <distortionT2>0.0</distortionT2>
+            </plugin>
+            </sensor>
+        </gazebo>
+
+    </xacro:macro>
+  
+</robot>

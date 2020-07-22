@@ -1,0 +1,4 @@
+<launch>
+  <!-- Load the robot description -->
+  <param name="robot_description" command="$(find xacro)/xacro.py '$(find turtlebot3_description)/urdf/turtlebot3_waffle_pi.urdf.xacro' --inorder" />
+</launch>

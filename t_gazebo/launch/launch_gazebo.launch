@@ -1,0 +1,30 @@
+<launch>
+
+<include file="$(find t_gazebo)/launch/robot_description.launch"/>
+
+<arg name="gui" default="false" />
+
+<arg name="map_file" value="$(find aws_robomaker_small_warehouse_world)/maps/002/map.yaml" />
+
+	<!-- Launch Gazebo world -->
+	<include file="$(find gazebo_ros)/launch/empty_world.launch">
+		<arg name="gui" value="$(arg gui)" />
+        <arg name="paused" default="false"/>
+        <arg name="use_sim_time" default="true"/>
+		    <arg name="verbose" value="true"/>
+        <arg name="world_name" value="$(find aws_robomaker_small_warehouse_world)/worlds/no_roof_small_warehouse.world"/>/>		
+	</include> 
+
+  <!-- Spawn URDF into Gazebo -->
+  <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model"  args="-param /robot_description -urdf -model robot -x 0 -y 0 -Y 0 "/>
+  
+  <!-- Publish static joints to tf -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" output="screen">
+    <param name="use_tf_static" value="true" />
+    <param name="publish_frequency" value="50.0" />
+  </node>
+
+  <!-- Run the navigation stack -->
+  <include file="$(find turtlebot3_navigation)/launch/turtlebot3_navigation_gazebo.launch" />
+
+</launch>
